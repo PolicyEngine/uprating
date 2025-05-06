@@ -199,7 +199,6 @@ if st.button("Calculate Uprated Values"):
             "Year": years,
             "Uprating Factor": [f"{factor*100:.2f}%" if factor is not None else "N/A" for factor in uprating_factors],
             "Uprated Value": uprated_values,
-            "Month Used": used_months
         }
         
         df = pd.DataFrame(data)
