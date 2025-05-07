@@ -79,10 +79,10 @@ with st.sidebar:
     
     # Define available uprating parameters
     uprating_options = [
+        "gov.irs.uprating",         # IRS Uprating Factor
         "gov.bls.cpi.cpi_u",        # CPI-U (Consumer Price Index for All Urban Consumers)
         "gov.bls.cpi.cpi_w",        # CPI-W (Consumer Price Index for Urban Wage Earners and Clerical Workers)
         "gov.bls.cpi.c_cpi_u",      # C-CPI-U (Chained Consumer Price Index for All Urban Consumers)
-        "gov.irs.uprating",         # IRS Uprating Factor
     ]
     
     # Let the user select the uprating parameter
@@ -121,18 +121,6 @@ if st.button("Calculate Uprated Values"):
             if value_for_year is not None:
                 year_values[year] = value_for_year
                 month_used[year] = month
-        
-        # Add debug information
-        if show_debug := st.checkbox("Show debug information"):
-            st.write("Year values:")
-            debug_data = []
-            for year in sorted(year_values.keys()):
-                debug_data.append({
-                    "Year": year,
-                    "Month": month_used[year],
-                    "Value": year_values[year]
-                })
-            st.dataframe(pd.DataFrame(debug_data))
         
         # First year is never uprated (original value)
         uprated_values.append(value)
@@ -213,12 +201,3 @@ if st.button("Calculate Uprated Values"):
     except Exception as e:
         st.error(f"Error in calculation: {e}")
         st.info("Please try a different uprating parameter or check your inputs.")
-
-    st.info("""
-    **Calculation Method Information:**
-    - Using ratio-based uprating: dividing each year's value by the previous year's value
-    - For historical years (up to 2024), uses the last available month in the year
-    - For projection years (2025+), uses the first available month in the year
-    - The first year is always the original value (no uprating applied)
-    - For years beyond 2035, the latest available uprating factor is applied
-    """)
