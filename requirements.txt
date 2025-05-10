@@ -4,4 +4,3 @@ policyengine-us
 pyyaml
 setuptools
 pandas
-distutils
