@@ -71,7 +71,7 @@ with st.sidebar:
     start_year = st.number_input("Enter start year:", min_value=2015, max_value=max_year, value=current_year, step=1)
     
     # Number of years to project (fixed 1-10 years)
-    projection_years = st.slider("Number of years to project:", min_value=1, max_value=10, value=5)
+    projection_years = 20
     
     # Get parameters from the system
     parameters = system.parameters
