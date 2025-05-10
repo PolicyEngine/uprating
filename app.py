@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
-from policyengine_core.periods import instant, Period, MONTH
+from policyengine_core.periods import instant
 from policyengine_us.system import system
-from datetime import datetime
 
 # Define the number of months in a year
 MONTHS_IN_YEAR = 12
