@@ -2,3 +2,5 @@ streamlit
 policyengine-core
 policyengine-us
 pyyaml
+setuptools
+pandas
