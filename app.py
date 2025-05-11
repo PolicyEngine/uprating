@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from policyengine_core.periods import instant
 from policyengine_us.system import system
+from rounding import round_value, apply_rounding_to_dataframe
 
 # Define the number of months in a year
 MONTHS_IN_YEAR = 12
@@ -86,6 +87,28 @@ with st.sidebar:
     
     # Let the user select the uprating parameter
     selected_uprating = st.selectbox("Select uprating parameter:", uprating_options)
+    
+    # Add Rounding Options
+    st.header("Rounding Options")
+    
+    # Enable/disable rounding
+    
+    # Rounding base input - allow user to enter any number
+    rounding_base_selection = st.number_input(
+        "Round to:",
+        min_value=0.01,
+        max_value=10000.0,
+        value=1.0,
+        step=1.0,
+        format="%.2f",
+    )
+    
+    # Rounding method selection
+    rounding_method = st.radio(
+        "Rounding method:",
+        options=["nearest", "upwards", "downwards"],
+        format_func=lambda x: f"Round {x}",
+    )
 
 # Main calculations
 if st.button("Calculate Uprated Values"):
@@ -190,12 +213,35 @@ if st.button("Calculate Uprated Values"):
         
         df = pd.DataFrame(data)
         
-        # Format the uprated values to 2 decimal places
-        df["Uprated Value"] = df["Uprated Value"].round(2)
+        # Create a copy of the original values for display
+        df["Original Value"] = df["Uprated Value"].copy()
         
-        # Display the DataFrame with nice formatting
-        st.subheader("Uprated Values")
-        st.dataframe(df.style.format({"Uprated Value": "${:,.2f}"}), use_container_width=True)
+        # Apply rounding to the uprated values
+        df = apply_rounding_to_dataframe(df, "Uprated Value", rounding_base_selection, rounding_method)
+        
+        # Display both original and rounded values
+        df_display = df[["Year", "Uprating Factor", "Original Value", "Uprated Value"]]
+        
+        # Format the values to 2 decimal places
+        df_display["Original Value"] = df_display["Original Value"].round(2)
+        df_display["Uprated Value"] = df_display["Uprated Value"].round(2)
+        
+        # Rename columns to show rounding details
+        df_display = df_display.rename(columns={
+            "Original Value": "Pre-Rounded Value",
+            "Uprated Value": f"Rounded Value ({rounding_method} to {rounding_base_selection})"
+        })
+        
+        st.subheader("Uprated Values (with Rounding)")
+        st.dataframe(
+            df_display.style.format({
+                "Pre-Rounded Value": "${:,.2f}",
+                f"Rounded Value ({rounding_method} to {rounding_base_selection})": "${:,.2f}"
+            }),
+            hide_index=True,
+            use_container_width=True
+        )
+
             
     except Exception as e:
         st.error(f"Error in calculation: {e}")
